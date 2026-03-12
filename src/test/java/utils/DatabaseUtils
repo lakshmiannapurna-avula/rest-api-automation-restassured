@@ -1,1 +1,57 @@
+package utils;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class DatabaseUtils {
+
+    private static final String DB_URL = "jdbc:mysql://localhost:8080/testdb";
+    private static final String USER = "test";
+    private static final String PASSWORD = "password";
+
+    public static Connection getConnection() throws Exception {
+        return DriverManager.getConnection(DB_URL, USER, PASSWORD);
+    }
+
+    public static String getPostTitleById(int postId) throws Exception {
+        Connection conn = getConnection();
+        Statement stmt = conn.createStatement();
+
+        ResultSet rs = stmt.executeQuery(
+                "SELECT title FROM posts WHERE id = " + postId
+        );
+
+        String title = null;
+        if (rs.next()) {
+            title = rs.getString("title");
+        }
+
+        rs.close();
+        stmt.close();
+        conn.close();
+
+        return title;
+    }
+
+    public static int getUserIdByPostId(int postId) throws Exception {
+        Connection conn = getConnection();
+        Statement stmt = conn.createStatement();
+
+        ResultSet rs = stmt.executeQuery(
+                "SELECT user_id FROM posts WHERE id = " + postId
+        );
+
+        int userId = 0;
+        if (rs.next()) {
+            userId = rs.getInt("user_id");
+        }
+
+        rs.close();
+        stmt.close();
+        conn.close();
+
+        return userId;
+    }
+}
