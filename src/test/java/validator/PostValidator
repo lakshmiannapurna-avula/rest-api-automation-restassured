@@ -1,1 +1,16 @@
+package validators;
 
+import org.testng.Assert;
+import utils.DatabaseUtils;
+
+public class PostValidator {
+
+    public static void validatePostInDatabase(int postId, String expectedTitle, int expectedUserId) throws Exception {
+        String actualTitle = DatabaseUtils.getPostTitleById(postId);
+        int actualUserId = DatabaseUtils.getUserIdByPostId(postId);
+
+        Assert.assertNotNull(actualTitle, "Post title was not found in database.");
+        Assert.assertEquals(actualTitle, expectedTitle, "Post title mismatch in database.");
+        Assert.assertEquals(actualUserId, expectedUserId, "User ID mismatch in database.");
+    }
+}
