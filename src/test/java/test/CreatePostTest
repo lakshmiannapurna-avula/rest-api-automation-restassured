@@ -1,1 +1,53 @@
+package tests;
 
+import base.BaseApiTest;
+import io.restassured.http.ContentType;
+import org.testng.annotations.Test;
+import validators.PostValidator;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static io.restassured.RestAssured.given;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+
+public class CreatePostTest extends BaseApiTest {
+
+    @Test
+    public void verifyCreatePost() throws Exception {
+        String expectedTitle = "Mastercard API Automation";
+        String expectedBody = "Sample post created using Java, Spring Boot, REST Assured and DB validation";
+        int expectedUserId = 101;
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("title", expectedTitle);
+        requestBody.put("body", expectedBody);
+        requestBody.put("userId", expectedUserId);
+
+        Integer postId =
+                given()
+                    .contentType(ContentType.JSON)
+                    .body(requestBody)
+                .when()
+                    .post("/posts")
+                .then()
+                    .statusCode(201)
+                    .extract()
+                    .path("id");
+
+        String actualTitle =
+                given()
+                .when()
+                    .get("/posts/" + postId)
+                .then()
+                    .statusCode(200)
+                    .extract()
+                    .path("title");
+
+        assertNotNull(postId, "Post ID should not be null.");
+        assertEquals(actualTitle, expectedTitle, "API response title mismatch.");
+
+        PostValidator.validatePostInDatabase(postId, expectedTitle, expectedUserId);
+    }
+}
